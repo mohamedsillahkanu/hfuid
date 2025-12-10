@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICF-SL HF UID Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+            font-family: 'Oswald', Arial, sans-serif;
+            color: #000000;
+            font-weight: 500;
+            padding: 20px;
+        }
+
+        .page-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            background-color: #004080;
+            color: #ffffff;
+            padding: 25px 30px;
+            text-align: center;
+            margin-bottom: 15px;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .logo-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 15px;
+        }
+
+        .logo-box {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-box img {
+            width: 100px;
+            height: auto;
+            border-radius: 6px;
+        }
+
+        .page-header h3 {
+            margin: 12px 0 5px;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #ffffff;
+        }
+
+        .page-header .tagline {
+            margin: 0;
+            font-size: 10px;
+            font-weight: 500;
+            color: #ffffff;
+        }
+
+        .page-header h1 {
+            margin: 20px 0 10px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 1px;
+        }
+
+        .page-header .subtitle {
+            font-size: 14px;
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        .content-card {
+            border: 4px double #004080;
+            border-radius: 12px;
+            padding: 12px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+        }
+
+        .content-inner {
+            padding: 25px;
+        }
+
+        .upload-section {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 8px;
+            border: 2px dashed #004080;
+            text-align: center;
+            margin: 1.5rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: #0056b3;
+            background: #e7f3ff;
+        }
+
+        .upload-section h3 {
+            color: #004080;
+            margin-bottom: 1rem;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .upload-section p {
+            color: #000000;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            background: #004080;
+            color: white;
+            padding: 14px 24px;
+            border-radius: 6px;
+            border: 2px solid #004080;
+            font-size: 14px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: 'Oswald', Arial, sans-serif;
+            margin-top: 1rem;
+        }
+
+        .file-input-wrapper:hover {
+            background: #0056b3;
+            border-color: #0056b3;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .section-header {
+            background-color: #004080;
+            color: #ffffff;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-icon {
+            background: #ffffff;
+            color: #004080;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .stats-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border: 2px solid #004080;
+            transition: all 0.2s;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 64, 128, 0.2);
+        }
+
+        .stats-card h4 {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .stats-card .metric-value {
+            font-size: 2rem;
+            color: #004080;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .stats-card p {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .btn {
+            padding: 14px 24px;
+            border: 2px solid #004080;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: 'Oswald', Arial, sans-serif;
+            transition: all 0.2s;
+            margin: 5px;
+        }
+
+        .btn-primary {
+            background: #004080;
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+            border-color: #0056b3;
+        }
+
+        .btn-secondary {
+            background: #ffffff;
+            color: #004080;
+        }
+
+        .btn-secondary:hover {
+            background: #004080;
+            color: #ffffff;
+        }
+
+        .btn-gold {
+            background: #ffc107;
+            color: #000000;
+            border-color: #ffc107;
+        }
+
+        .btn-gold:hover {
+            background: #e0a800;
+            border-color: #e0a800;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: #ffffff;
+            border-color: #28a745;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            border-color: #218838;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            color: #721c24;
+        }
+
+        .alert-info {
+            background: #e7f3ff;
+            border: 2px solid #004080;
+            color: #004080;
+        }
+
+        .info-message {
+            background: #e7f3ff;
+            color: #004080;
+            padding: 1rem;
+            border-radius: 6px;
+            border: 2px solid #004080;
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            color: #004080;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #004080;
+            border-radius: 6px;
+            font-size: 14px;
+            background: #ffffff;
+            color: #000000;
+            font-family: 'Oswald', Arial, sans-serif;
+            font-weight: 500;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #0056b3;
+            box-shadow: 0 0 0 3px rgba(0, 64, 128, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .config-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 2px solid #004080;
+            margin: 1rem 0;
+        }
+
+        .config-card h4 {
+            color: #004080;
+            margin-bottom: 1rem;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.5rem;
+            max-height: 250px;
+            overflow-y: auto;
+            padding: 1rem;
+            border: 2px solid #004080;
+            border-radius: 6px;
+            background: #ffffff;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+            color: #000000;
+        }
+
+        .checkbox-item:hover {
+            background: #e7f3ff;
+        }
+
+        .checkbox-item input {
+            margin-right: 0.75rem;
+            accent-color: #004080;
+            width: 18px;
+            height: 18px;
+        }
+
+        .checkbox-item.selected {
+            background: #e7f3ff;
+            border: 1px solid #004080;
+        }
+
+        .preview-box {
+            background: #ffffff;
+            border: 2px solid #004080;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        .preview-box .preview-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .preview-box .preview-item:last-child {
+            border-bottom: none;
+        }
+
+        .preview-box .original {
+            color: #666;
+        }
+
+        .preview-box .new-id {
+            color: #004080;
+            font-weight: 700;
+        }
+
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 13px;
+        }
+
+        .preview-table th {
+            background: #004080;
+            color: #ffffff;
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 700;
+        }
+
+        .preview-table td {
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .preview-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .preview-table .hfuid-cell {
+            background: #e7f3ff;
+            color: #004080;
+            font-weight: 700;
+        }
+
+        .loading-spinner {
+            border: 4px solid #e7f3ff;
+            border-top: 4px solid #004080;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 2px solid #004080;
+        }
+
+        .feature-card h4 {
+            color: #004080;
+            margin-bottom: 1rem;
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .feature-card ol, .feature-card ul {
+            color: #000000;
+            line-height: 1.8;
+            padding-left: 1.5rem;
+        }
+
+        .feature-card li {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .feature-card strong {
+            color: #004080;
+        }
+
+        .page-footer {
+            background-color: #004080;
+            color: #ffffff;
+            padding: 20px 30px;
+            text-align: center;
+            font-size: 13px;
+            line-height: 1.7;
+            font-weight: 500;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .page-footer p {
+            margin: 6px 0 0;
+            font-size: 12px;
+            color: #ffffff;
+        }
+
+        .table-container {
+            max-height: 400px;
+            overflow: auto;
+            border: 2px solid #004080;
+            border-radius: 6px;
+        }
+
+        .mapping-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .mapping-table th {
+            background: #004080;
+            color: #ffffff;
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 700;
+            position: sticky;
+            top: 0;
+        }
+
+        .mapping-table td {
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .mapping-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .mapping-table .hfuid {
+            color: #004080;
+            font-weight: 700;
+            font-family: monospace;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #004080;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            .content-inner {
+                padding: 15px;
+            }
+            .page-header h1 {
+                font-size: 20px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <div class="page-header">
+            <div class="logo-row">
+                <div class="logo-box">
+                    <img src="https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg" alt="ICF-SL Logo">
+                </div>
+            </div>
+            <h3>Informatics Consultancy Firm-Sierra Leone<br>(ICF-SL)</h3>
+            <p class="tagline"><em>Driving Data-Driven Solutions for Health and Development</em></p>
+            <h1>HF UID GENERATOR</h1>
+            <p class="subtitle">Generate unique Health Facility IDs from existing columns</p>
+        </div>
+
+        <div class="content-card">
+            <div class="content-inner">
+
+                <!-- Alert Container -->
+                <div id="alertContainer"></div>
+
+                <!-- Upload Section -->
+                <div id="uploadSection">
+                    <div class="upload-section">
+                        <h3>UPLOAD YOUR DATA FILE</h3>
+                        <p>Upload a CSV or Excel file with health facility data</p>
+                        <label class="file-input-wrapper">
+                            Choose File
+                            <input type="file" id="fileInput" accept=".csv,.xlsx,.xls">
+                        </label>
+                        
+                        <div id="uploadProgress" class="hidden">
+                            <div class="loading-spinner"></div>
+                            <p>Processing your file...</p>
+                        </div>
+                    </div>
+
+                    <!-- Features Section -->
+                    <div class="section-header">
+                        <span class="section-icon">?</span>
+                        <span class="section-title">HOW IT WORKS</span>
+                    </div>
+                    
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <h4>Process</h4>
+                            <ol>
+                                <li><strong>Upload:</strong> CSV or Excel file</li>
+                                <li><strong>Select:</strong> Columns to group by</li>
+                                <li><strong>Configure:</strong> Prefix (hf_, fac_, etc.)</li>
+                                <li><strong>Generate:</strong> Unique hf_uid codes</li>
+                                <li><strong>Download:</strong> Updated file</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <h4>Grouping</h4>
+                            <ul>
+                                <li><strong>Select multiple:</strong> adm1, adm2, adm3, hf</li>
+                                <li><strong>Unique combo:</strong> Each combination = 1 ID</li>
+                                <li><strong>Example:</strong> Western|Urban|Freetown|HospA → hf_1</li>
+                                <li><strong>Same combo:</strong> Gets same ID across rows</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <h4>Output</h4>
+                            <ul>
+                                <li>New "hf_uid" column: hf_1, hf_2...</li>
+                                <li>Unique ID per combination</li>
+                                <li>Mapping table included</li>
+                                <li>Download as Excel or CSV</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Configuration Section -->
+                <div id="configSection" class="hidden">
+                    <div class="section-header">
+                        <span class="section-icon">⚙</span>
+                        <span class="section-title">CONFIGURE HF UID</span>
+                    </div>
+
+                    <div class="info-message">
+                        <strong>Select the columns</strong> that together identify a unique health facility (e.g., adm1 + adm2 + adm3 + facility name). Each unique combination will get a unique ID.
+                    </div>
+
+                    <div class="config-card">
+                        <h4>Select Columns to Combine (Group By)</h4>
+                        <p style="color: #666; font-size: 13px; margin-bottom: 1rem;">Select one or more columns. The unique combination of selected columns will define each facility.</p>
+                        <div class="checkbox-group" id="sourceColumns">
+                            <!-- Checkboxes populated dynamically -->
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <button class="btn btn-secondary" onclick="selectAll()">Select All</button>
+                            <button class="btn btn-secondary" onclick="deselectAll()">Deselect All</button>
+                        </div>
+                    </div>
+
+                    <div class="config-card">
+                        <h4>ID Format Settings</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="prefix">Prefix</label>
+                                <input type="text" id="prefix" class="form-control" value="hf_" onkeyup="updatePreview()">
+                                <small style="color: #666; font-size: 12px;">Example: hf_, fac_, ou_</small>
+                            </div>
+                        </div>
+                        <div class="info-message" style="margin-top: 1rem;">
+                            IDs will be generated as: <strong>hf_1, hf_2, hf_3...</strong> (one per unique combination)
+                        </div>
+                    </div>
+
+                    <div class="config-card">
+                        <h4>Preview (First 5 unique values)</h4>
+                        <div class="preview-box" id="previewBox">
+                            <p style="color: #666; text-align: center;">Select a source column to see preview</p>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 1.5rem;">
+                        <button class="btn btn-gold" onclick="generateUIDs()">Generate HF UIDs</button>
+                        <button class="btn btn-secondary" onclick="resetFile()">Upload Different File</button>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div id="resultsSection" class="hidden">
+                    <div class="section-header">
+                        <span class="section-icon">✓</span>
+                        <span class="section-title">RESULTS</span>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stats-card">
+                            <h4>Total Records</h4>
+                            <div class="metric-value" id="totalRecords">0</div>
+                            <p>Data rows</p>
+                        </div>
+                        <div class="stats-card">
+                            <h4>Unique Facilities</h4>
+                            <div class="metric-value" id="uniqueFacilities">0</div>
+                            <p>Unique IDs generated</p>
+                        </div>
+                        <div class="stats-card">
+                            <h4>ID Range</h4>
+                            <div class="metric-value" id="idRange" style="font-size: 1.2rem;">-</div>
+                            <p>First to Last</p>
+                        </div>
+                    </div>
+
+                    <div class="config-card">
+                        <h4>Grouped By Columns</h4>
+                        <p id="groupedColumnsInfo" style="font-size: 14px; color: #004080; font-weight: 700;"></p>
+                    </div>
+
+                    <div class="config-card">
+                        <h4>Facility Mapping Table</h4>
+                        <div class="table-container" style="max-height: 300px;">
+                            <table class="mapping-table" id="mappingTable">
+                                <!-- Table populated dynamically -->
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="config-card">
+                        <h4>Data Preview (First 20 rows)</h4>
+                        <div class="table-container">
+                            <table class="preview-table" id="previewTable">
+                                <!-- Table populated dynamically -->
+                            </table>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin: 2rem 0;">
+                        <button class="btn btn-success" onclick="downloadExcel()">Download Data (Excel)</button>
+                        <button class="btn btn-primary" onclick="downloadCSV()">Download Data (CSV)</button>
+                        <button class="btn btn-secondary" onclick="downloadMapping()">Download Mapping Only</button>
+                        <button class="btn btn-secondary" onclick="backToConfig()">Change Settings</button>
+                        <button class="btn btn-secondary" onclick="resetFile()">Start Over</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="page-footer">
+            <p style="margin: 0; font-weight: 700;">National Malaria Control Programme</p>
+            <p>Ministry of Health and Sanitation, Sierra Leone</p>
+            <p style="font-size: 11px;">Medical Stores Compound, Freetown, Sierra Leone</p>
+            <p style="font-size: 10px;">© 2025 Informatics Consultancy Firm-Sierra Leone (ICF-SL)</p>
+        </div>
+    </div>
+
+    <script>
+        let rawData = null;
+        let processedData = null;
+        let mappingData = null;
+        let availableColumns = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('fileInput').addEventListener('change', handleFileUpload);
+        });
+
+        function showAlert(message, type = 'info') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.parentNode.removeChild(alertDiv);
+                }
+            }, 5000);
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const fileName = file.name;
+            const fileExtension = fileName.split('.').pop().toLowerCase();
+
+            document.getElementById('uploadProgress').classList.remove('hidden');
+
+            if (fileExtension === 'csv') {
+                Papa.parse(file, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        loadData(results.data, fileName);
+                    },
+                    error: function(error) {
+                        showAlert('Error reading CSV: ' + error.message, 'error');
+                        document.getElementById('uploadProgress').classList.add('hidden');
+                    }
+                });
+            } else if (['xlsx', 'xls'].includes(fileExtension)) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, {type: 'array'});
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                        loadData(jsonData, fileName);
+                    } catch (error) {
+                        showAlert('Error reading Excel: ' + error.message, 'error');
+                        document.getElementById('uploadProgress').classList.add('hidden');
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            } else {
+                showAlert('Please upload a CSV or Excel file', 'error');
+                document.getElementById('uploadProgress').classList.add('hidden');
+            }
+        }
+
+        function loadData(data, fileName) {
+            document.getElementById('uploadProgress').classList.add('hidden');
+            
+            if (!data || data.length === 0) {
+                showAlert('The file appears to be empty.', 'error');
+                return;
+            }
+
+            rawData = data;
+            availableColumns = Object.keys(data[0] || {});
+
+            showAlert(`Loaded ${data.length} rows and ${availableColumns.length} columns.`, 'success');
+            
+            populateColumnSelector();
+            
+            document.getElementById('uploadSection').classList.add('hidden');
+            document.getElementById('configSection').classList.remove('hidden');
+        }
+
+        function populateColumnSelector() {
+            const container = document.getElementById('sourceColumns');
+            container.innerHTML = '';
+
+            availableColumns.forEach(col => {
+                container.innerHTML += `
+                    <label class="checkbox-item">
+                        <input type="checkbox" value="${col}" onchange="updatePreview()">
+                        <span>${col}</span>
+                    </label>
+                `;
+            });
+
+            // Auto-select likely columns
+            const facilityPatterns = ['facility', 'name', 'hf_name', 'org_unit', 'orgunit', 'health_facility', 'hf', 'adm1', 'adm2', 'adm3', 'adm4', 'district', 'chiefdom', 'region'];
+            availableColumns.forEach(col => {
+                const colLower = col.toLowerCase();
+                if (facilityPatterns.some(p => colLower.includes(p))) {
+                    const checkbox = document.querySelector(`#sourceColumns input[value="${col}"]`);
+                    if (checkbox) checkbox.checked = true;
+                }
+            });
+            updatePreview();
+        }
+
+        function selectAll() {
+            document.querySelectorAll('#sourceColumns input[type="checkbox"]').forEach(cb => {
+                cb.checked = true;
+            });
+            updatePreview();
+        }
+
+        function deselectAll() {
+            document.querySelectorAll('#sourceColumns input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+            updatePreview();
+        }
+
+        function getSelectedColumns() {
+            return Array.from(document.querySelectorAll('#sourceColumns input:checked')).map(cb => cb.value);
+        }
+
+        function getCombinedKey(row, columns) {
+            return columns.map(col => row[col] || '').join('|');
+        }
+
+        function updatePreview() {
+            const selectedCols = getSelectedColumns();
+            const prefix = document.getElementById('prefix').value || 'hf_';
+            const previewBox = document.getElementById('previewBox');
+
+            if (selectedCols.length === 0) {
+                previewBox.innerHTML = '<p style="color: #666; text-align: center;">Select at least one column to see preview</p>';
+                return;
+            }
+
+            // Get unique combinations
+            const uniqueKeys = new Set();
+            const uniqueCombos = [];
+            
+            rawData.forEach(row => {
+                const key = getCombinedKey(row, selectedCols);
+                if (key && !uniqueKeys.has(key)) {
+                    uniqueKeys.add(key);
+                    uniqueCombos.push({
+                        key: key,
+                        display: selectedCols.map(col => row[col] || '').join(' | ')
+                    });
+                }
+            });
+
+            const previewCombos = uniqueCombos.slice(0, 5);
+
+            let html = `<p style="color: #004080; font-weight: 700; margin-bottom: 0.5rem;">Combining: ${selectedCols.join(' + ')}</p>`;
+            
+            previewCombos.forEach((combo, index) => {
+                const newId = `${prefix}${index + 1}`;
+                html += `<div class="preview-item">
+                    <span class="original" style="font-size: 12px;">${combo.display}</span>
+                    <span class="new-id">→ ${newId}</span>
+                </div>`;
+            });
+
+            if (uniqueCombos.length > 5) {
+                html += `<div class="preview-item" style="color: #666; font-style: italic;">
+                    ... and ${uniqueCombos.length - 5} more unique combinations
+                </div>`;
+            }
+
+            html += `<p style="color: #28a745; font-weight: 700; margin-top: 1rem;">Total unique facilities: ${uniqueCombos.length}</p>`;
+
+            previewBox.innerHTML = html;
+        }
+
+        function generateUIDs() {
+            const selectedCols = getSelectedColumns();
+            const prefix = document.getElementById('prefix').value || 'hf_';
+
+            if (selectedCols.length === 0) {
+                showAlert('Please select at least one column', 'error');
+                return;
+            }
+
+            // Get unique combinations and create mapping
+            const uniqueKeys = new Map();
+            let counter = 1;
+            
+            rawData.forEach(row => {
+                const key = getCombinedKey(row, selectedCols);
+                if (key && !uniqueKeys.has(key)) {
+                    uniqueKeys.set(key, {
+                        hf_uid: `${prefix}${counter}`,
+                        display: selectedCols.map(col => row[col] || '').join(' | ')
+                    });
+                    counter++;
+                }
+            });
+
+            // Create mapping data
+            mappingData = [];
+            uniqueKeys.forEach((value, key) => {
+                const parts = key.split('|');
+                const mappingRow = { hf_uid: value.hf_uid };
+                selectedCols.forEach((col, index) => {
+                    mappingRow[col] = parts[index] || '';
+                });
+                mappingData.push(mappingRow);
+            });
+
+            // Apply mapping to data
+            processedData = rawData.map(row => {
+                const key = getCombinedKey(row, selectedCols);
+                const mapping = uniqueKeys.get(key);
+                const newRow = { hf_uid: mapping ? mapping.hf_uid : '', ...row };
+                return newRow;
+            });
+
+            showAlert('HF UIDs generated successfully!', 'success');
+            updateResults(uniqueKeys.size, prefix, selectedCols);
+
+            document.getElementById('configSection').classList.add('hidden');
+            document.getElementById('resultsSection').classList.remove('hidden');
+        }
+
+        function updateResults(uniqueCount, prefix, selectedCols) {
+            document.getElementById('totalRecords').textContent = processedData.length.toLocaleString();
+            document.getElementById('uniqueFacilities').textContent = uniqueCount.toLocaleString();
+            
+            const firstId = `${prefix}1`;
+            const lastId = `${prefix}${uniqueCount}`;
+            document.getElementById('idRange').textContent = `${firstId} - ${lastId}`;
+
+            // Show grouped columns info
+            const groupedInfo = document.getElementById('groupedColumnsInfo');
+            if (groupedInfo) {
+                groupedInfo.textContent = selectedCols.join(' + ');
+            }
+
+            // Generate mapping table
+            generateMappingTable(selectedCols);
+            
+            // Generate preview table
+            generatePreviewTable();
+        }
+
+        function generateMappingTable(selectedCols) {
+            const table = document.getElementById('mappingTable');
+            
+            // Build header with selected columns
+            let html = '<thead><tr><th>#</th><th>HF UID</th>';
+            selectedCols.forEach(col => {
+                html += `<th>${col}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+
+            mappingData.forEach((item, index) => {
+                html += `<tr>
+                    <td>${index + 1}</td>
+                    <td class="hfuid">${item.hf_uid}</td>`;
+                selectedCols.forEach(col => {
+                    html += `<td>${item[col] || ''}</td>`;
+                });
+                html += '</tr>';
+            });
+
+            html += '</tbody>';
+            table.innerHTML = html;
+        }
+
+        function generatePreviewTable() {
+            const table = document.getElementById('previewTable');
+            const previewData = processedData.slice(0, 20);
+            
+            // Get columns to display
+            const allCols = Object.keys(processedData[0] || {});
+            const displayCols = allCols.slice(0, 7);
+
+            let html = '<thead><tr>';
+            displayCols.forEach(col => {
+                html += `<th>${col}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+
+            previewData.forEach(row => {
+                html += '<tr>';
+                displayCols.forEach(col => {
+                    if (col === 'hf_uid') {
+                        html += `<td class="hfuid-cell">${row[col]}</td>`;
+                    } else {
+                        const val = row[col];
+                        html += `<td>${val !== null && val !== undefined ? val : ''}</td>`;
+                    }
+                });
+                html += '</tr>';
+            });
+
+            html += '</tbody>';
+            table.innerHTML = html;
+        }
+
+        function backToConfig() {
+            document.getElementById('resultsSection').classList.add('hidden');
+            document.getElementById('configSection').classList.remove('hidden');
+        }
+
+        function downloadExcel() {
+            if (!processedData) return;
+
+            const ws = XLSX.utils.json_to_sheet(processedData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Data');
+            XLSX.writeFile(wb, 'data_with_hf_uid.xlsx');
+            
+            showAlert('Excel file downloaded!', 'success');
+        }
+
+        function downloadCSV() {
+            if (!processedData) return;
+
+            const csv = Papa.unparse(processedData);
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'data_with_hf_uid.csv';
+            link.click();
+            
+            showAlert('CSV file downloaded!', 'success');
+        }
+
+        function downloadMapping() {
+            if (!mappingData) return;
+
+            const ws = XLSX.utils.json_to_sheet(mappingData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Mapping');
+            XLSX.writeFile(wb, 'hf_uid_mapping.xlsx');
+            
+            showAlert('Mapping file downloaded!', 'success');
+        }
+
+        function resetFile() {
+            rawData = null;
+            processedData = null;
+            mappingData = null;
+            availableColumns = [];
+
+            document.getElementById('uploadSection').classList.remove('hidden');
+            document.getElementById('configSection').classList.add('hidden');
+            document.getElementById('resultsSection').classList.add('hidden');
+            document.getElementById('fileInput').value = '';
+            document.getElementById('alertContainer').innerHTML = '';
+        }
+    </script>
+</body>
+</html>
